@@ -1,0 +1,69 @@
+Function openInternetExplora($kaspersky)
+{
+$ie = New-Object -ComObject "InternetExplorer.Application"
+Write-Output $kaspersky "has reveived"  
+$ie.Navigate($kaspersky)
+$ie.Visible = $true
+$ie.FullScreen = $true
+}
+
+Function sleepcheck($status)
+{
+$p1 = [System.Windows.Forms.Cursor]::Position
+Start-Sleep -Seconds 1    # 15 minutses
+$p2 = [System.Windows.Forms.Cursor]::Position
+if ($p1.X -eq $p2.X -and $p1.Y -eq $p2.Y)
+    {
+    return $flase
+    }
+else
+    {
+    return $true
+    }
+}
+
+
+
+$kaspersky = "https://cybermap.kaspersky.com/"
+$screensaver=$false
+$IEstatus = $false
+$ErrorActionPreference = 'SilentlyContinue'
+
+for(;;){
+
+$status = sleepcheck($status)
+
+if( $status -eq $true) #if the mouse did move IE should close
+    {
+    "Mouse DID Move"
+    Stop-Process -Name "iexplore"
+    $screensaver=$false
+    $IEstatus = $false
+    "Screen save allowed:"
+    Write-Output $screensaver
+    "Screen Status: "
+    Write-Output $IEstatus
+    }
+
+else
+    {
+    "Mouse DID NOT Move" #if the mouse didn't move IE should open
+
+    $screensaver=$true
+
+    if($screensaver -eq $true -and $IEstatus -eq $false)
+    {
+    openInternetExplora($kaspersky)
+    Start-Sleep -Seconds 10
+    #Write-Output $kaspersky "has send to IE"
+
+    $screensaver=$true
+    $IEstatus=$true
+    "Screen save allowed:"
+    Write-Output $screensaver
+    "Screen Status: "
+    Write-Output $IEstatus
+    }
+    
+    }
+}
